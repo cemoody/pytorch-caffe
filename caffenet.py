@@ -936,17 +936,23 @@ class CaffeNet(nn.Module):
                 #models[lname] = nn.Upsample(scale_factor=2, mode='bilinear')
                 in_channels = blob_channels[bname]
                 out_channels = int(layer['convolution_param']['num_output'])
-                group = int(layer['convolution_param']['group'])
-                kernel_w = int(layer['convolution_param']['kernel_w'])
-                kernel_h = int(layer['convolution_param']['kernel_h'])
-                stride_w = int(layer['convolution_param']['stride_w'])
-                stride_h = int(layer['convolution_param']['stride_h'])
-                pad_w = int(layer['convolution_param']['pad_w'])
-                pad_h = int(layer['convolution_param']['pad_h'])
-                kernel_size = (kernel_h, kernel_w)
-                stride = (stride_h, stride_w)
-                padding = (pad_h, pad_w)
-                bias_term = layer['convolution_param']['bias_term'] != 'false'
+                group = int(layer['convolution_param'].get('group', 1))
+                kernel_size = int(layer['convolution_param'].get('kernel_size', None))
+                if kernel_size is None:
+                    kernel_w = int(layer['convolution_param'].get('kernel_w', None))
+                    kernel_h = int(layer['convolution_param'].get('kernel_h', None))
+                    kernel_size = (kernel_h, kernel_w)
+                stride = int(layer['convolution_param'].get('stride', 1))
+                if stride is None:
+                    stride_w = int(layer['convolution_param'].get('stride_w', None))
+                    stride_h = int(layer['convolution_param'].get('stride_h', None))
+                    stride = (stride_h, stride_w)
+                padding = int(layer['convolution_param'].get('pad', 0))
+                if padding is None:
+                    padding_w = int(layer['convolution_param'].get('pad_w', None))
+                    padding_h = int(layer['convolution_param'].get('pad_h', None))
+                    padding = (padding_h, padding_w)
+                bias_term = layer['convolution_param'].get('bias_term', '') != 'false'
                 models[lname] = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=kernel_size, stride = stride, padding=padding, groups = group, bias=bias_term)
                 blob_channels[tname] = out_channels
                 blob_width[tname] = 2 * blob_width[bname]
