@@ -198,6 +198,19 @@ class Softmax(nn.Module):
         x = x.view(*orig_size)
         return x
 
+class Sigmoid(nn.Module):
+    def __repr__(self):
+        return 'Sigmoid'
+
+    def forward(self, x):
+        return 
+        assert(self.axis == len(x.size())-1)
+        orig_size = x.size()        
+        dims = x.size(self.axis)
+        x = F.softmax(x.view(-1, dims))
+        x = x.view(*orig_size)
+        return x
+
 class SoftmaxWithLoss(nn.CrossEntropyLoss):
     def __init__(self):
         super(SoftmaxWithLoss, self).__init__()
@@ -984,6 +997,12 @@ class CaffeNet(nn.Module):
             elif ltype == 'SoftmaxWithLoss':
                 models[lname] =  SoftmaxWithLoss()
                 blob_channels[tname] = 1
+                blob_width[tname] = 1
+                blob_height[tname] = 1
+                i = i + 1
+            elif ltype == 'Sigmoid':
+                models[lname] = nn.Sigmoid()
+                blob_channels[tname] = blob_channels[bname]
                 blob_width[tname] = 1
                 blob_height[tname] = 1
                 i = i + 1
